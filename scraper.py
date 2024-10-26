@@ -199,7 +199,7 @@ def _login(browser, email, password):
     browser.maximize_window()
     browser.find_element(By.NAME, "email").send_keys(email)
     browser.find_element(By.NAME, "pass").send_keys(password)
-    browser.find_element(By.ID, 'loginbutton').click()
+    browser.find_element(By.NAME, 'login').click()
     time.sleep(5)
 
 
@@ -216,30 +216,38 @@ def _count_needed_scrolls(browser, infinite_scroll, numOfPost):
 
 
 def _scroll(browser, infinite_scroll, lenOfPage):
-    lastCount = -1
-    match = False
+    last_height = browser.execute_script("return document.body.scrollHeight")
+    scroll_attempts = 0
+    max_attempts = 5  # Number of times to try scrolling if no new content is loaded
+    scroll_count = 0  # Track the number of scrolls performed
 
-    while not match:
-        if infinite_scroll:
-            lastCount = lenOfPage
+    while True:
+        # Scroll to the bottom of the page
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        
+        # Wait for the page to load new content
+        time.sleep(3)  # Adjust sleep time if needed based on load speed
+
+        # Calculate new scroll height and compare with the last scroll height
+        new_height = browser.execute_script("return document.body.scrollHeight")
+        
+        if new_height == last_height:
+            scroll_attempts += 1
+            if scroll_attempts >= max_attempts:
+                # Break the loop if no new content is loaded after max_attempts
+                print("Reached the bottom of the page or no new content to load.")
+                break
         else:
-            lastCount += 1
-
-        # wait for the browser to load, this time can be changed slightly ~3 seconds with no difference, but 5 seems
-        # to be stable enough
-        time.sleep(5)
-
-        if infinite_scroll:
-            lenOfPage = browser.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return "
-                "lenOfPage;")
-        else:
-            browser.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return "
-                "lenOfPage;")
-
-        if lastCount == lenOfPage:
-            match = True
+            scroll_attempts = 0  # Reset attempts if new content loads
+        
+        # Update last_height to the new height
+        last_height = new_height
+        scroll_count += 1  # Increment scroll count after each scroll action
+        
+        # Check if scrolling should stop based on conditions
+        if not infinite_scroll and scroll_count >= lenOfPage:
+            print(f"Reached specified scroll limit: {lenOfPage}")
+            break
 
 
 def extract(page, numOfPost, infinite_scroll=False, scrape_comment=False):
@@ -253,7 +261,6 @@ def extract(page, numOfPost, infinite_scroll=False, scrape_comment=False):
         "profile.default_content_setting_values.notifications": 1
     })
 
-    # chromedriver should be in the same folder as file
     browser = webdriver.Chrome(options=option)
     _login(browser, EMAIL, PASSWORD)
     browser.get(page)

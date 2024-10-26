@@ -249,7 +249,6 @@ def _scroll(browser, infinite_scroll, lenOfPage):
             print(f"Reached specified scroll limit: {lenOfPage}")
             break
 
-
 def extract(page, numOfPost, infinite_scroll=False, scrape_comment=False):
     option = Options()
     option.add_argument("--disable-infobars")
@@ -263,6 +262,7 @@ def extract(page, numOfPost, infinite_scroll=False, scrape_comment=False):
 
     browser = webdriver.Chrome(options=option)
     _login(browser, EMAIL, PASSWORD)
+    page = f"{page}?sorting_setting=CHRONOLOGICAL"
     browser.get(page)
     lenOfPage = _count_needed_scrolls(browser, infinite_scroll, numOfPost)
     _scroll(browser, infinite_scroll, lenOfPage)

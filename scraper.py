@@ -172,6 +172,23 @@ def _extract_html(bs_data):
     #Add to check
     with open('./bs.html',"w", encoding="utf-8") as file:
         file.write(str(bs_data.prettify()))
+        
+    feed = bs_data.find('div', role='feed')
+    if feed:
+        children = list(feed.find_all(recursive=False))
+    
+        if len(children) > 1:
+            first_post = children[1]
+            post_classes = first_post.get('class', [])
+            all_posts = [post for post in feed.find_all('div', recursive=False) if post.get('class') == post_classes]
+            print(all_posts)
+            exit()
+            # for i, post in enumerate(all_posts, start=1):
+            #     print(f"Post {i} content:", post.get_text(strip=True))
+        else:
+            print("The feed div has fewer than 2 children.")
+    else:
+        print("Feed not found in HTML.")
 
     k = bs_data.find_all(class_="_5pcr userContentWrapper")
     postBigDict = list()

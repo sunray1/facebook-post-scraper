@@ -5,6 +5,7 @@ import csv
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup as bs
 
 
@@ -198,7 +199,7 @@ def _login(browser, email, password):
     browser.maximize_window()
     browser.find_element(By.NAME, "email").send_keys(email)
     browser.find_element(By.NAME, "pass").send_keys(password)
-    browser..find_element(By.ID, 'loginbutton').click()
+    browser.find_element(By.ID, 'loginbutton').click()
     time.sleep(5)
 
 

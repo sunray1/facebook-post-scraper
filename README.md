@@ -15,9 +15,7 @@ Scrape Facebook Public Posts without using Facebook API
 
 ## Install Requirements
 
-Please make sure chrome is installed and ```chromedriver``` is placed in the same directory as the file
-
-Find out which version of ```chromedriver``` you need to download in this link [Chrome Web Driver](http://chromedriver.chromium.org/downloads).
+Please make sure chrome is installed
 
 Place your Facebook login in info into ```facebook_credentials.txt```
 
